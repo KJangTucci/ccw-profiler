@@ -1,1 +1,100 @@
+:root {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  line-height: 1.4;
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header h1 {
+  margin: 0 0 8px 0;
+}
+
+.subhead {
+  margin: 0 0 20px 0;
+  opacity: 0.85;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+  margin: 12px 0;
+}
+
+.question {
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.options label {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.options input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.options input:checked + span {
+  display: block;
+  border-radius: 8px;
+  padding: 8px;
+  border: 2px solid #333;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #333;
+  background: white;
+  cursor: pointer;
+}
+
+button.primary {
+  background: #111;
+  color: white;
+  border-color: #111;
+}
+
+.small {
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 720px) {
+  .options {
+    grid-template-columns: 1fr;
+  }
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+}
 
