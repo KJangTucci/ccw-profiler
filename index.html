@@ -29,7 +29,12 @@
       .h3 { margin: 0 0 8px 0; font-size: 1.05rem; }
       .muted { color: #444; margin: 8px 0 0 0; }
 
-      .scale { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+      .scale {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      }
       .pill { border: 1px solid #eee; border-radius: 12px; padding: 10px; }
       .pill strong { display: inline-block; width: 24px; }
       .pill span { color: #444; }
@@ -42,31 +47,27 @@
       }
       .statement { font-weight: 650; margin-bottom: 4px; }
 
-      .options { display: grid; gap: 8px; margin-top: 12px; }
-      .options6 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      /* Likert options: 3 columns x 2 rows for 6 options */
+      .options { display: grid; gap: 10px; margin-top: 12px; }
+      .options6 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
       .option {
         border: 1px solid #e6e6e6;
         border-radius: 12px;
-        padding: 8px;
+        padding: 10px;
         display: grid;
         grid-template-columns: 28px 1fr;
         gap: 8px;
         align-items: center;
         cursor: pointer;
         user-select: none;
-        min-height: 56px;
+        min-height: 58px;
       }
-      .optText {
-        font-size: 0.85rem;
-        line-height: 1.2;
-      }
-
       .option input { position: absolute; opacity: 0; pointer-events: none; }
 
       .badge {
-        width: 26px;
-        height: 26px;
+        width: 28px;
+        height: 28px;
         border-radius: 10px;
         border: 1px solid #cfcfcf;
         display: grid;
@@ -75,14 +76,14 @@
         background: #fff;
         font-size: 0.95rem;
       }
+      .optText {
+        font-size: 0.86rem;
+        line-height: 1.2;
+        color: #222;
+      }
+
       .option:has(input:checked) { border-color: #111; }
       .option:has(input:checked) .badge { border-color: #111; background: #111; color: #fff; }
-
-      .optionsHelp {
-        margin-top: 10px;
-        font-size: 0.95rem;
-        line-height: 1.35;
-      }
 
       .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
       .btn {
@@ -107,6 +108,7 @@
 
       .profileLead { font-size: 1.15rem; font-weight: 650; margin-top: 6px; }
       .profileName { font-weight: 900; }
+
       .strengthsLine { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
       .tag { font-size: 0.9rem; border: 1px solid #e6e6e6; padding: 6px 10px; border-radius: 999px; color: #444; }
       .strengthsText { font-weight: 750; }
@@ -127,8 +129,10 @@
 
       @media (max-width: 860px) {
         .scale { grid-template-columns: 1fr; }
-        .options6 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .options6 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .option { min-height: 62px; }
         .badge { width: 30px; height: 30px; }
+        .optText { font-size: 0.9rem; }
       }
     </style>
   </head>
