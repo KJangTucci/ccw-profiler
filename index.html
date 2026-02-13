@@ -16,6 +16,7 @@
       .hero { padding: 18px 0 6px 0; }
       .hero h1 { margin: 0 0 8px 0; font-size: 1.8rem; }
       .hero p { margin: 0; color: #333; }
+
       .card {
         background: #fff;
         border: 1px solid #e5e5e5;
@@ -27,10 +28,12 @@
       .h2 { margin: 0 0 8px 0; font-size: 1.2rem; }
       .h3 { margin: 0 0 8px 0; font-size: 1.05rem; }
       .muted { color: #444; margin: 8px 0 0 0; }
+
       .scale { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
       .pill { border: 1px solid #eee; border-radius: 12px; padding: 10px; }
       .pill strong { display: inline-block; width: 24px; }
       .pill span { color: #444; }
+
       .qhead { display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: start; }
       .qnum {
         width: 36px; height: 36px; border-radius: 10px;
@@ -38,23 +41,46 @@
         font-weight: 700;
       }
       .statement { font-weight: 650; margin-bottom: 4px; }
-      .type { color: #555; font-size: 0.95rem; }
-      .options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+
+      /* Options */
+      .options { display: grid; gap: 8px; margin-top: 12px; }
+
+      /* Six options on one line (desktop), narrower buttons */
+      .options6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+
       .option {
-        border: 1px solid #e6e6e6; border-radius: 12px; padding: 10px;
-        display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: center;
+        border: 1px solid #e6e6e6;
+        border-radius: 12px;
+        padding: 8px;
+        display: grid;
+        place-items: center;
         cursor: pointer;
         user-select: none;
       }
+      .optionCompact { padding: 6px; }
+
       .option input { position: absolute; opacity: 0; pointer-events: none; }
+
       .badge {
-        width: 28px; height: 28px; border-radius: 10px;
-        border: 1px solid #cfcfcf; display: grid; place-items: center;
-        font-weight: 700; background: #fff;
+        width: 26px;
+        height: 26px;
+        border-radius: 10px;
+        border: 1px solid #cfcfcf;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        background: #fff;
+        font-size: 0.95rem;
       }
-      .optlabel { color: #333; }
       .option:has(input:checked) { border-color: #111; }
       .option:has(input:checked) .badge { border-color: #111; background: #111; color: #fff; }
+
+      .optionsHelp {
+        margin-top: 10px;
+        font-size: 0.95rem;
+        line-height: 1.35;
+      }
+
       .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
       .btn {
         border: 1px solid #111;
@@ -66,6 +92,7 @@
         font-weight: 650;
       }
       .btn.primary { background: #111; color: #fff; }
+
       .error {
         margin-top: 12px;
         padding: 10px 12px;
@@ -74,22 +101,30 @@
         border: 1px solid #ffd0d0;
         color: #8a0000;
       }
+
       .profileName { font-size: 1.25rem; font-weight: 800; margin: 6px 0 0 0; }
-      .topline { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
-      .tag { font-size: 0.9rem; border: 1px solid #e6e6e6; padding: 6px 10px; border-radius: 999px; color: #444; }
-      .topstrengths { font-weight: 750; }
-      .scoregrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
-      .scorecard { border: 1px solid #eee; border-radius: 12px; padding: 12px; }
-      .scoretitle { color: #444; font-weight: 700; font-size: 0.95rem; }
-      .scorevalue { font-size: 1.6rem; font-weight: 900; margin-top: 4px; }
-      .scoresub { color: #666; font-size: 0.9rem; margin-top: 2px; }
+      .subtleLine { margin-top: 10px; }
+
+      .profileImageWrap { margin-top: 14px; }
+      .profileImage {
+        width: 100%;
+        max-height: 320px;
+        object-fit: contain;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        background: #fafafa;
+      }
+
       .bullets { margin: 8px 0 0 18px; color: #333; }
       footer { padding: 10px 0 20px 0; color: #666; font-size: 0.95rem; }
 
       @media (max-width: 860px) {
         .scale { grid-template-columns: 1fr; }
-        .options { grid-template-columns: 1fr; }
-        .scoregrid { grid-template-columns: 1fr; }
+
+        /* On small screens, wrap the 6 options to 3 per row for tap targets */
+        .options6 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+        .badge { width: 30px; height: 30px; }
       }
     </style>
   </head>
