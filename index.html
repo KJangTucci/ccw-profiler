@@ -42,10 +42,7 @@
       }
       .statement { font-weight: 650; margin-bottom: 4px; }
 
-      /* Options */
       .options { display: grid; gap: 8px; margin-top: 12px; }
-
-      /* Six options on one line (desktop), narrower buttons */
       .options6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 
       .option {
@@ -102,8 +99,12 @@
         color: #8a0000;
       }
 
-      .profileName { font-size: 1.25rem; font-weight: 800; margin: 6px 0 0 0; }
-      .subtleLine { margin-top: 10px; }
+      .profileLead { font-size: 1.15rem; font-weight: 650; margin-top: 6px; }
+      .profileName { font-weight: 900; }
+      .strengthsLine { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+      .tag { font-size: 0.9rem; border: 1px solid #e6e6e6; padding: 6px 10px; border-radius: 999px; color: #444; }
+      .strengthsText { font-weight: 750; }
+      .desc { margin-top: 12px; color: #222; }
 
       .profileImageWrap { margin-top: 14px; }
       .profileImage {
@@ -120,10 +121,7 @@
 
       @media (max-width: 860px) {
         .scale { grid-template-columns: 1fr; }
-
-        /* On small screens, wrap the 6 options to 3 per row for tap targets */
         .options6 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-
         .badge { width: 30px; height: 30px; }
       }
     </style>
