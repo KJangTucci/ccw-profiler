@@ -50,11 +50,17 @@
         border-radius: 12px;
         padding: 8px;
         display: grid;
-        place-items: center;
+        grid-template-columns: 28px 1fr;
+        gap: 8px;
+        align-items: center;
         cursor: pointer;
         user-select: none;
+        min-height: 56px;
       }
-      .optionCompact { padding: 6px; }
+      .optText {
+        font-size: 0.85rem;
+        line-height: 1.2;
+      }
 
       .option input { position: absolute; opacity: 0; pointer-events: none; }
 
