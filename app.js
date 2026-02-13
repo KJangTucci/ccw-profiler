@@ -1,5 +1,5 @@
 // app.js
-// Renders survey, computes subscale averages, selects top 3 strengths, and displays profile.
+// Renders survey, shuffles items, computes subscale averages, selects top 3 strengths, and displays profile.
 // No data is stored or transmitted.
 
 (function () {
@@ -14,13 +14,11 @@
     { value: 6, label: "Exactly like me" }
   ];
 
-  function reverseScore(v) {
-    // For 1-6 scale: 1<->6, 2<->5, 3<->4
-    return 7 - v;
-  }
+  // In-memory only - used to keep one shuffle order while the page is open.
+  let shuffledItems = [];
 
-  function prettyType(typeKey) {
-    return (window.CCW_TYPE_LABELS && window.CCW_TYPE_LABELS[typeKey]) ? window.CCW_TYPE_LABELS[typeKey] : typeKey;
+  function reverseScore(v) {
+    return 7 - v; // 1-6 reverse
   }
 
   function escapeHtml(str) {
@@ -32,7 +30,27 @@
       .replaceAll("'", "&#039;");
   }
 
+  function prettyType(typeKey) {
+    return (window.CCW_TYPE_LABELS && window.CCW_TYPE_LABELS[typeKey]) ? window.CCW_TYPE_LABELS[typeKey] : typeKey;
+  }
+
+  function shuffle(array) {
+    // Fisher-Yates
+    const a = [...array];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function initShuffle() {
+    shuffledItems = shuffle(window.CCW_ITEMS);
+  }
+
   function renderSurvey() {
+    if (!shuffledItems.length) initShuffle();
+
     const intro = `
       <section class="card">
         <h2 class="h2">Instructions</h2>
@@ -46,7 +64,7 @@
       </section>
     `;
 
-    const questions = window.CCW_ITEMS.map(renderItem).join("");
+    const questions = shuffledItems.map(renderItem).join("");
 
     const actions = `
       <section class="card">
@@ -75,11 +93,13 @@
       const profileKey = makeSortedKey(top3);
       const profileName = window.CCW_PROFILE_NAMES[profileKey] || window.CCW_DEFAULT_PROFILE_NAME;
 
-      renderResults(profileName, top3, avgs);
+      renderResults(profileKey, profileName, top3);
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
     document.getElementById("btnReset").addEventListener("click", () => {
+      // New shuffle on reset
+      initShuffle();
       renderSurvey();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -87,13 +107,14 @@
 
   function renderItem(item, idx) {
     const num = idx + 1;
+
+    // Narrower option cards, arranged 6 across on wide screens.
     const options = SCALE.map(s => {
       const id = `${item.id}_${s.value}`;
       return `
-        <label class="option" for="${id}">
+        <label class="option optionCompact" for="${id}">
           <input id="${id}" type="radio" name="${item.id}" value="${s.value}" />
           <span class="badge">${s.value}</span>
-          <span class="optlabel">${escapeHtml(s.label)}</span>
         </label>
       `;
     }).join("");
@@ -104,11 +125,15 @@
           <div class="qnum">${num}</div>
           <div class="qtext">
             <div class="statement">${escapeHtml(item.text)}</div>
-            <div class="type">${escapeHtml(prettyType(item.type))}</div>
           </div>
         </div>
-        <div class="options" role="radiogroup" aria-label="${escapeHtml(item.text)}">
+
+        <div class="options options6" role="radiogroup" aria-label="${escapeHtml(item.text)}">
           ${options}
+        </div>
+
+        <div class="optionsHelp muted" aria-hidden="true">
+          ${SCALE.map(s => `<span><strong>${s.value}</strong> ${escapeHtml(s.label)}</span>`).join(" · ")}
         </div>
       </section>
     `;
@@ -116,7 +141,7 @@
 
   function getResponses() {
     const responses = {};
-    for (const item of window.CCW_ITEMS) {
+    for (const item of shuffledItems) {
       const chosen = document.querySelector(`input[name="${item.id}"]:checked`);
       if (!chosen) return { ok: false, missingId: item.id };
       let v = Number(chosen.value);
@@ -135,6 +160,7 @@
     }
 
     for (const item of window.CCW_ITEMS) {
+      // Use original items list for type assignment consistency
       const v = responses[item.id];
       sums[item.type] += v;
       counts[item.type] += 1;
@@ -148,7 +174,7 @@
   }
 
   function getTopKTypes(avgs, k) {
-    // Sort by: avg desc, then label asc for stable tie-breaking.
+    // Sort by avg desc, then label asc for stable tie-breaking
     const entries = Object.entries(avgs)
       .filter(([, v]) => Number.isFinite(v))
       .sort((a, b) => {
@@ -166,10 +192,13 @@
     return [...types].sort().join("|");
   }
 
-  function renderResults(profileName, top3, avgs) {
+  function renderResults(profileKey, profileName, top3) {
     const top3Labels = top3.map(prettyType);
 
-    const strengthsList = top3.map((t) => {
+    const imagePath = (window.CCW_PROFILE_IMAGES && window.CCW_PROFILE_IMAGES[profileKey]) ? window.CCW_PROFILE_IMAGES[profileKey] : null;
+
+    // Aggregate the three scripts, but do not show "top strengths" or any calculation.
+    const strengthsSections = top3.map((t) => {
       const title = prettyType(t);
       const script = window.CCW_SCRIPTS[t] || "";
       return `
@@ -180,35 +209,22 @@
       `;
     }).join("");
 
-    const scoreCards = top3
-      .map((t) => {
-        const avg = avgs[t];
-        return `
-          <div class="scorecard">
-            <div class="scoretitle">${escapeHtml(prettyType(t))}</div>
-            <div class="scorevalue">${Number.isFinite(avg) ? avg.toFixed(2) : "NA"}</div>
-            <div class="scoresub">Average (1 to 6)</div>
-          </div>
-        `;
-      })
-      .join("");
-
     appEl.innerHTML = `
       <section class="card">
         <h2 class="h2">Your CCW Profile</h2>
         <div class="profileName">${escapeHtml(profileName)}</div>
         <p class="muted">
-          Your profile is based on your three highest CCW dimensions in this assessment.
-          This tool is strengths-focused and is intended for reflection and learning.
+          This is a strengths-based reflection tool. Your profile is based on your highest-scoring areas in this assessment.
         </p>
 
-        <div class="topline">
-          <div class="tag">Top strengths</div>
-          <div class="topstrengths">${escapeHtml(top3Labels.join(" + "))}</div>
-        </div>
+        ${imagePath ? `
+          <div class="profileImageWrap">
+            <img class="profileImage" src="${escapeHtml(imagePath)}" alt="Profile image for ${escapeHtml(profileName)}" />
+          </div>
+        ` : ""}
 
-        <div class="scoregrid">
-          ${scoreCards}
+        <div class="subtleLine muted">
+          Profile components: ${escapeHtml(top3Labels.join(" + "))}
         </div>
 
         <div class="actions">
@@ -217,7 +233,7 @@
         </div>
       </section>
 
-      ${strengthsList}
+      ${strengthsSections}
 
       <section class="card">
         <h3 class="h3">Reflection prompt</h3>
@@ -235,6 +251,7 @@
     });
 
     document.getElementById("btnStartOver").addEventListener("click", () => {
+      initShuffle();
       renderSurvey();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -258,5 +275,6 @@
   }
 
   // Boot
+  initShuffle();
   renderSurvey();
 })();
