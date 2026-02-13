@@ -251,9 +251,9 @@
       <section class="card">
         <h3 class="h3">Reflection prompt</h3>
         <ul class="bullets">
-          <li>Where do you see these strengths showing up in your academic life right now?</li>
           <li>Which people, spaces, or practices help you draw on these strengths most?</li>
-          <li>How might you intentionally leverage these strengths in a current challenge or goal?</li>
+          <li>Where do you see these strengths showing up in your academic life right now?</li>
+          <li>In what ways can you leverage these assets to make positive changes in your community and in society more broadly?</li>
         </ul>
       </section>
     `;
