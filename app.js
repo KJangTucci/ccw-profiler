@@ -3,11 +3,12 @@
   const appEl = document.getElementById("app");
 
   const SCALE = [
-    { value: 1, label: "Strongly disagree" },
-    { value: 2, label: "Disagree" },
-    { value: 3, label: "Neutral" },
-    { value: 4, label: "Agree" },
-    { value: 5, label: "Strongly agree" }
+    { value: 1, label: "Not at all like me" },
+    { value: 2, label: "Very slightly like me" },
+    { value: 3, label: "Slightly like me" },
+    { value: 4, label: "Moderately like me" },
+    { value: 5, label: "Very much like me" },
+    { value: 6, label: "Exactly like me" }
   ];
 
   // Cut points for Low / Mid / High using average score (1-5).
