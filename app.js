@@ -14,11 +14,10 @@
     { value: 6, label: "Exactly like me" }
   ];
 
-  // In-memory only - used to keep one shuffle order while the page is open.
   let shuffledItems = [];
 
   function reverseScore(v) {
-    return 7 - v; // 1-6 reverse
+    return 7 - v;
   }
 
   function escapeHtml(str) {
@@ -35,7 +34,6 @@
   }
 
   function shuffle(array) {
-    // Fisher-Yates
     const a = [...array];
     for (let i = a.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -98,7 +96,6 @@
     });
 
     document.getElementById("btnReset").addEventListener("click", () => {
-      // New shuffle on reset
       initShuffle();
       renderSurvey();
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -108,7 +105,6 @@
   function renderItem(item, idx) {
     const num = idx + 1;
 
-    // Narrower option cards, arranged 6 across on wide screens.
     const options = SCALE.map(s => {
       const id = `${item.id}_${s.value}`;
       return `
@@ -160,7 +156,6 @@
     }
 
     for (const item of window.CCW_ITEMS) {
-      // Use original items list for type assignment consistency
       const v = responses[item.id];
       sums[item.type] += v;
       counts[item.type] += 1;
@@ -174,7 +169,6 @@
   }
 
   function getTopKTypes(avgs, k) {
-    // Sort by avg desc, then label asc for stable tie-breaking
     const entries = Object.entries(avgs)
       .filter(([, v]) => Number.isFinite(v))
       .sort((a, b) => {
@@ -192,30 +186,26 @@
     return [...types].sort().join("|");
   }
 
-  function renderResults(profileKey, profileName, top3) {
-    const top3Labels = top3.map(prettyType);
+  function joinAsOneParagraph(typeKeys) {
+    // Merge the three scripts into one paragraph.
+    // The scripts already begin with "You...", so we join with spaces and normalize spacing.
+    const parts = typeKeys
+      .map(k => (window.CCW_SCRIPTS[k] || "").trim())
+      .filter(Boolean);
 
+    return parts.join(" ").replace(/\s+/g, " ").trim();
+  }
+
+  function renderResults(profileKey, profileName, top3) {
     const imagePath = (window.CCW_PROFILE_IMAGES && window.CCW_PROFILE_IMAGES[profileKey]) ? window.CCW_PROFILE_IMAGES[profileKey] : null;
 
-    // Aggregate the three scripts, but do not show "top strengths" or any calculation.
-    const strengthsSections = top3.map((t) => {
-      const title = prettyType(t);
-      const script = window.CCW_SCRIPTS[t] || "";
-      return `
-        <section class="card">
-          <h3 class="h3">${escapeHtml(title)}</h3>
-          <p>${escapeHtml(script)}</p>
-        </section>
-      `;
-    }).join("");
+    const topStrengthsLine = top3.map(prettyType).join(" + ");
+    const mergedDescription = joinAsOneParagraph(top3);
 
     appEl.innerHTML = `
       <section class="card">
         <h2 class="h2">Your CCW Profile</h2>
-        <div class="profileName">${escapeHtml(profileName)}</div>
-        <p class="muted">
-          This is a strengths-based reflection tool. Your profile is based on your highest-scoring areas in this assessment.
-        </p>
+        <div class="profileLead">You are a <span class="profileName">${escapeHtml(profileName)}</span>.</div>
 
         ${imagePath ? `
           <div class="profileImageWrap">
@@ -223,17 +213,18 @@
           </div>
         ` : ""}
 
-        <div class="subtleLine muted">
-          Profile components: ${escapeHtml(top3Labels.join(" + "))}
+        <div class="strengthsLine">
+          <span class="tag">Top strengths</span>
+          <span class="strengthsText">${escapeHtml(topStrengthsLine)}</span>
         </div>
+
+        <p class="desc">${escapeHtml(mergedDescription)}</p>
 
         <div class="actions">
           <button class="btn" id="btnBack" type="button">Back to questions</button>
           <button class="btn" id="btnStartOver" type="button">Start over</button>
         </div>
       </section>
-
-      ${strengthsSections}
 
       <section class="card">
         <h3 class="h3">Reflection prompt</h3>
@@ -274,7 +265,6 @@
     if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  // Boot
   initShuffle();
   renderSurvey();
 })();
