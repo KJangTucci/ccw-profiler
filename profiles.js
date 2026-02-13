@@ -164,3 +164,14 @@ window.CCW_PROFILE_NAMES = {
   // "familial|chosen_familial|navigational": "assets/profiles/community-grounded-navigator.png"
 //};
 window.CCW_DEFAULT_PROFILE_NAME = "Integrative Strength Portfolio";
+// Ensure profile keys match app.js (sorted lookup)
+(function normalizeProfileKeys() {
+  const src = window.CCW_PROFILE_NAMES || {};
+  const out = {};
+  for (const [key, name] of Object.entries(src)) {
+    const sorted = key.split("|").sort().join("|");
+    out[sorted] = name;
+  }
+  window.CCW_PROFILE_NAMES = out;
+})();
+
