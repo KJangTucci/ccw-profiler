@@ -155,3 +155,5 @@ window.CCW_PROFILE_NAMES = {
   // Final remaining combination
   "spiritual|linguistic_multilingual|linguistic_modes_of_speech": "Spiritually Anchored Global Communicator"
 };
+
+window.CCW_DEFAULT_PROFILE_NAME = "Integrative Strength Portfolio";
