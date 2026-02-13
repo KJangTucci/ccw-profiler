@@ -108,12 +108,14 @@
     const options = SCALE.map(s => {
       const id = `${item.id}_${s.value}`;
       return `
-        <label class="option optionCompact" for="${id}">
+        <label class="option optionWide" for="${id}">
           <input id="${id}" type="radio" name="${item.id}" value="${s.value}" />
           <span class="badge">${s.value}</span>
+          <span class="optText">${escapeHtml(s.label)}</span>
         </label>
       `;
     }).join("");
+
 
     return `
       <section class="card" id="${item.id}">
@@ -128,9 +130,6 @@
           ${options}
         </div>
 
-        <div class="optionsHelp muted" aria-hidden="true">
-          ${SCALE.map(s => `<span><strong>${s.value}</strong> ${escapeHtml(s.label)}</span>`).join(" · ")}
-        </div>
       </section>
     `;
   }
