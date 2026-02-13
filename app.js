@@ -1,6 +1,7 @@
 // app.js
-// Renders survey, shuffles items, computes subscale averages, selects top 3 strengths,
-// and displays a named profile with an aggregated (single-paragraph) strengths description.
+// Fix A: keep your existing CCW_PROFILE_NAMES as-is, but ensure lookup uses the
+// same sorted key that the profile map expects, and log debug info to help you
+// see why a fallback name is used.
 // No data is stored or transmitted.
 
 (function () {
@@ -15,11 +16,10 @@
     { value: 6, label: "Exactly like me" }
   ];
 
-  // In-memory only - preserves one shuffle order while the page is open.
   let shuffledItems = [];
 
   function reverseScore(v) {
-    return 7 - v; // 1-6 reverse
+    return 7 - v;
   }
 
   function escapeHtml(str) {
@@ -38,7 +38,6 @@
   }
 
   function shuffle(array) {
-    // Fisher-Yates
     const a = [...array];
     for (let i = a.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -99,17 +98,27 @@
       const avgs = computeAverages(check.responses);
       const top3 = getTopKTypes(avgs, 3);
 
+      // Fix A: always compute a sorted key, and look up using that exact key.
       const profileKey = makeSortedKey(top3);
-      const profileName = (window.CCW_PROFILE_NAMES && window.CCW_PROFILE_NAMES[profileKey])
-        ? window.CCW_PROFILE_NAMES[profileKey]
-        : (window.CCW_DEFAULT_PROFILE_NAME || "Integrative Strength Portfolio");
+
+      const profileName =
+        (window.CCW_PROFILE_NAMES && window.CCW_PROFILE_NAMES[profileKey]) ||
+        (window.CCW_DEFAULT_PROFILE_NAME || "Integrative Strength Portfolio");
+
+      // Debug logs: open DevTools console to inspect key mismatches.
+      // If profileName falls back to default, compare "Profile key" to your
+      // keys in CCW_PROFILE_NAMES in profiles.js.
+      console.log("CCW debug - top3:", top3);
+      console.log("CCW debug - profileKey:", profileKey);
+      console.log("CCW debug - has profile map:", Boolean(window.CCW_PROFILE_NAMES));
+      console.log("CCW debug - profileName:", profileName);
 
       renderResults(profileKey, profileName, top3);
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
     document.getElementById("btnReset").addEventListener("click", () => {
-      initShuffle(); // new shuffle order on reset
+      initShuffle();
       renderSurvey();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -165,7 +174,6 @@
       counts[t] = 0;
     }
 
-    // Use the original items list to assign types (stable), even though display is shuffled
     for (const item of window.CCW_ITEMS) {
       const v = responses[item.id];
       sums[item.type] += v;
@@ -180,7 +188,6 @@
   }
 
   function getTopKTypes(avgs, k) {
-    // Sort by: avg desc, then label asc for stable tie-breaking.
     const entries = Object.entries(avgs)
       .filter(([, v]) => Number.isFinite(v))
       .sort((a, b) => {
@@ -207,9 +214,10 @@
   }
 
   function renderResults(profileKey, profileName, top3) {
-    const imagePath = (window.CCW_PROFILE_IMAGES && window.CCW_PROFILE_IMAGES[profileKey])
-      ? window.CCW_PROFILE_IMAGES[profileKey]
-      : null;
+    const imagePath =
+      (window.CCW_PROFILE_IMAGES && window.CCW_PROFILE_IMAGES[profileKey])
+        ? window.CCW_PROFILE_IMAGES[profileKey]
+        : null;
 
     const topStrengthsLine = top3.map(prettyType).join(" + ");
     const mergedDescription = joinAsOneParagraph(top3);
@@ -284,4 +292,3 @@
   initShuffle();
   renderSurvey();
 })();
- 
