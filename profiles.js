@@ -156,4 +156,11 @@ window.CCW_PROFILE_NAMES = {
   "spiritual|linguistic_multilingual|linguistic_modes_of_speech": "Spiritually Anchored Global Communicator"
 };
 
+// Optional: map profile key to an image filename you will add later.
+// Put images in a folder like /assets/profiles/ and reference them here.
+// If an entry is missing, the app will simply not show an image.
+//window.CCW_PROFILE_IMAGES = {
+  // Example:
+  // "familial|chosen_familial|navigational": "assets/profiles/community-grounded-navigator.png"
+//};
 window.CCW_DEFAULT_PROFILE_NAME = "Integrative Strength Portfolio";
