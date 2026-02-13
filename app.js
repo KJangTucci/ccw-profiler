@@ -57,7 +57,7 @@
       <section class="card">
         <h2 class="h2">Instructions</h2>
         <p class="muted">
-          Respond to each statement using the scale below. When you click "View my profile", your results are calculated locally in your browser.
+          This is a reflection tool assessing your cultural strengths. The following questions ask about yourself and your life experiences in general. On a scale from 1 (Not at all like me) to 6 (Exactly like me), please indicate how well each of the following statements describes you. Click "View my profile" once you complete the survey. Your responses are processed locally in your browser and are not saved or transmitted.
           Your responses are not saved or sent anywhere.
         </p>
 
