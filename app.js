@@ -1,5 +1,6 @@
 // app.js
-// Renders survey, shuffles items, computes subscale averages, selects top 3 strengths, and displays profile.
+// Renders survey, shuffles items, computes subscale averages, selects top 3 strengths,
+// and displays a named profile with an aggregated (single-paragraph) strengths description.
 // No data is stored or transmitted.
 
 (function () {
@@ -14,10 +15,11 @@
     { value: 6, label: "Exactly like me" }
   ];
 
+  // In-memory only - preserves one shuffle order while the page is open.
   let shuffledItems = [];
 
   function reverseScore(v) {
-    return 7 - v;
+    return 7 - v; // 1-6 reverse
   }
 
   function escapeHtml(str) {
@@ -30,10 +32,13 @@
   }
 
   function prettyType(typeKey) {
-    return (window.CCW_TYPE_LABELS && window.CCW_TYPE_LABELS[typeKey]) ? window.CCW_TYPE_LABELS[typeKey] : typeKey;
+    return (window.CCW_TYPE_LABELS && window.CCW_TYPE_LABELS[typeKey])
+      ? window.CCW_TYPE_LABELS[typeKey]
+      : typeKey;
   }
 
   function shuffle(array) {
+    // Fisher-Yates
     const a = [...array];
     for (let i = a.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -56,8 +61,14 @@
           Respond to each statement using the scale below. When you click "View my profile", your results are calculated locally in your browser.
           Your responses are not saved or sent anywhere.
         </p>
+
         <div class="scale">
-          ${SCALE.map(s => `<div class="pill"><strong>${s.value}</strong><span>${escapeHtml(s.label)}</span></div>`).join("")}
+          ${SCALE.map(s => `
+            <div class="pill">
+              <strong>${s.value}</strong>
+              <span>${escapeHtml(s.label)}</span>
+            </div>
+          `).join("")}
         </div>
       </section>
     `;
@@ -89,14 +100,16 @@
       const top3 = getTopKTypes(avgs, 3);
 
       const profileKey = makeSortedKey(top3);
-      const profileName = window.CCW_PROFILE_NAMES[profileKey] || window.CCW_DEFAULT_PROFILE_NAME;
+      const profileName = (window.CCW_PROFILE_NAMES && window.CCW_PROFILE_NAMES[profileKey])
+        ? window.CCW_PROFILE_NAMES[profileKey]
+        : (window.CCW_DEFAULT_PROFILE_NAME || "Integrative Strength Portfolio");
 
       renderResults(profileKey, profileName, top3);
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
     document.getElementById("btnReset").addEventListener("click", () => {
-      initShuffle();
+      initShuffle(); // new shuffle order on reset
       renderSurvey();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -116,8 +129,6 @@
       `;
     }).join("");
 
-
-
     return `
       <section class="card" id="${item.id}">
         <div class="qhead">
@@ -130,7 +141,6 @@
         <div class="options options6" role="radiogroup" aria-label="${escapeHtml(item.text)}">
           ${options}
         </div>
-
       </section>
     `;
   }
@@ -155,6 +165,7 @@
       counts[t] = 0;
     }
 
+    // Use the original items list to assign types (stable), even though display is shuffled
     for (const item of window.CCW_ITEMS) {
       const v = responses[item.id];
       sums[item.type] += v;
@@ -169,6 +180,7 @@
   }
 
   function getTopKTypes(avgs, k) {
+    // Sort by: avg desc, then label asc for stable tie-breaking.
     const entries = Object.entries(avgs)
       .filter(([, v]) => Number.isFinite(v))
       .sort((a, b) => {
@@ -187,17 +199,17 @@
   }
 
   function joinAsOneParagraph(typeKeys) {
-    // Merge the three scripts into one paragraph.
-    // The scripts already begin with "You...", so we join with spaces and normalize spacing.
     const parts = typeKeys
-      .map(k => (window.CCW_SCRIPTS[k] || "").trim())
+      .map(k => (window.CCW_SCRIPTS && window.CCW_SCRIPTS[k] ? String(window.CCW_SCRIPTS[k]).trim() : ""))
       .filter(Boolean);
 
     return parts.join(" ").replace(/\s+/g, " ").trim();
   }
 
   function renderResults(profileKey, profileName, top3) {
-    const imagePath = (window.CCW_PROFILE_IMAGES && window.CCW_PROFILE_IMAGES[profileKey]) ? window.CCW_PROFILE_IMAGES[profileKey] : null;
+    const imagePath = (window.CCW_PROFILE_IMAGES && window.CCW_PROFILE_IMAGES[profileKey])
+      ? window.CCW_PROFILE_IMAGES[profileKey]
+      : null;
 
     const topStrengthsLine = top3.map(prettyType).join(" + ");
     const mergedDescription = joinAsOneParagraph(top3);
@@ -205,7 +217,10 @@
     appEl.innerHTML = `
       <section class="card">
         <h2 class="h2">Your CCW Profile</h2>
-        <div class="profileLead">You are a <span class="profileName">${escapeHtml(profileName)}</span>.</div>
+
+        <div class="profileLead">
+          You are a <span class="profileName">${escapeHtml(profileName)}</span>.
+        </div>
 
         ${imagePath ? `
           <div class="profileImageWrap">
@@ -265,6 +280,7 @@
     if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
+  // Boot
   initShuffle();
   renderSurvey();
 })();
