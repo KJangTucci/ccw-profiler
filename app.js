@@ -249,16 +249,11 @@
       <section class="card">
         <h3 class="h3">Strengths snapshot map</h3>
         <p class="muted">
-          This map is a reflection snapshot of where your responses are showing up across areas right now. It is not a grade.
+          This map is a snapshot of where your responses are showing up across different types of community cultural wealth scale.
         </p>
 
         <div class="radarWrap">
           <canvas id="radarCanvas" aria-label="Community Cultural Wealth strengths snapshot map" role="img"></canvas>
-        </div>
-
-        <div class="radarLegend muted">
-          <span class="legendDot"></span>
-          <span>Your current pattern</span>
         </div>
       </section>
 
@@ -314,8 +309,13 @@
     // Soft visual design (non-evaluative)
     const centerX = size / 2;
     const centerY = size / 2;
-    const outerR = (size * 0.36);
-    const labelR = (size * 0.44);
+
+    // Give labels room so they don't get clipped by the canvas edge
+    const labelPadding = 64; // increase if you still see clipping (try 72)
+    const outerR = (size / 2) - labelPadding;
+
+    // Place labels a bit outside the grid, but still within canvas bounds
+    const labelR = outerR + 28;
 
     const rings = 3; // gentle guide rings (no numbers)
     const startAngle = -Math.PI / 2; // top
