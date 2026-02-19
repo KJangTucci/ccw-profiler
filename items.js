@@ -14,6 +14,18 @@ window.CCW_TYPES = [
   "linguistic_modes_of_speech"
 ];
 
+window.CCW_TYPE_LABELS = {
+  familial: "Familial",
+  chosen_familial: "Chosen Familial",
+  navigational: "Navigational",
+  aspirational: "Aspirational",
+  resistant_action: "Resistant Action",
+  resistant_awareness: "Resistant Awareness",
+  spiritual: "Spiritual",
+  linguistic_multilingual: "Linguistic Multilingualism",
+  linguistic_modes_of_speech: "Linguistic Modes of Speech"
+};
+
 // Items: 1-5 Likert assumed in app.js.
 // reverse: false for all here (set true if you later add reverse-coded items).
 
