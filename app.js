@@ -393,8 +393,18 @@
     for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
     ctx.closePath();
 
-    ctx.fillStyle = polyFill;
+    const fillGrad = ctx.createRadialGradient(
+    centerX, centerY, outerR * 0.08,
+    centerX, centerY, outerR
+  );
+
+    // center a bit stronger, edges fade out
+    fillGrad.addColorStop(0, "rgba(183, 47, 52, 0.22)");  // #b72f34
+    fillGrad.addColorStop(1, "rgba(183, 47, 52, 0.04)");
+
+    ctx.fillStyle = fillGrad;
     ctx.fill();
+
 
     ctx.strokeStyle = polyStroke;
     ctx.lineWidth = 2;
