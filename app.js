@@ -1,7 +1,5 @@
 // app.js
-// Fix A: keep your existing CCW_PROFILE_NAMES as-is, but ensure lookup uses the
-// same sorted key that the profile map expects, and log debug info to help you
-// see why a fallback name is used.
+// Adds a soft radar "map" of CCW subscale patterns on the results page.
 // No data is stored or transmitted.
 
 (function () {
@@ -57,7 +55,8 @@
       <section class="card">
         <h2 class="h2">Instructions</h2>
         <p class="muted">
-          This is a reflection tool assessing your cultural strengths. The following questions ask about yourself and your life experiences in general. On a scale from 1 (Not at all like me) to 6 (Exactly like me), please indicate how well each of the following statements describes you. Click "View my profile" once you complete the survey. Your responses are processed locally in your browser and are not saved or sent anywhere.
+          Respond to each statement using the scale below. When you click "View my profile", your results are calculated locally in your browser.
+          Your responses are not saved or sent anywhere.
         </p>
 
         <div class="scale">
@@ -97,22 +96,21 @@
       const avgs = computeAverages(check.responses);
       const top3 = getTopKTypes(avgs, 3);
 
-      // Fix A: always compute a sorted key, and look up using that exact key.
+      // Fix A: always compute sorted key and look up using that exact key.
       const profileKey = makeSortedKey(top3);
 
       const profileName =
         (window.CCW_PROFILE_NAMES && window.CCW_PROFILE_NAMES[profileKey]) ||
         (window.CCW_DEFAULT_PROFILE_NAME || "Integrative Strength Portfolio");
 
-      // Debug logs: open DevTools console to inspect key mismatches.
-      // If profileName falls back to default, compare "Profile key" to your
-      // keys in CCW_PROFILE_NAMES in profiles.js.
+      // Debug logs (open DevTools console)
       console.log("CCW debug - top3:", top3);
       console.log("CCW debug - profileKey:", profileKey);
       console.log("CCW debug - has profile map:", Boolean(window.CCW_PROFILE_NAMES));
       console.log("CCW debug - profileName:", profileName);
+      console.log("CCW debug - avgs:", avgs);
 
-      renderResults(profileKey, profileName, top3);
+      renderResults(profileKey, profileName, top3, avgs);
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
@@ -212,7 +210,7 @@
     return parts.join(" ").replace(/\s+/g, " ").trim();
   }
 
-  function renderResults(profileKey, profileName, top3) {
+  function renderResults(profileKey, profileName, top3, avgs) {
     const imagePath =
       (window.CCW_PROFILE_IMAGES && window.CCW_PROFILE_IMAGES[profileKey])
         ? window.CCW_PROFILE_IMAGES[profileKey]
@@ -249,11 +247,27 @@
       </section>
 
       <section class="card">
+        <h3 class="h3">Strengths snapshot map</h3>
+        <p class="muted">
+          This map is a reflection snapshot of where your responses are showing up across areas right now. It is not a grade.
+        </p>
+
+        <div class="radarWrap">
+          <canvas id="radarCanvas" aria-label="Community Cultural Wealth strengths snapshot map" role="img"></canvas>
+        </div>
+
+        <div class="radarLegend muted">
+          <span class="legendDot"></span>
+          <span>Your current pattern</span>
+        </div>
+      </section>
+
+      <section class="card">
         <h3 class="h3">Reflection prompt</h3>
         <ul class="bullets">
-          <li>Which people, spaces, or practices help you draw on these strengths most?</li>
           <li>Where do you see these strengths showing up in your academic life right now?</li>
-          <li>In what ways can you leverage these assets to make positive changes in your community and in society more broadly?</li>
+          <li>Which people, spaces, or practices help you draw on these strengths most?</li>
+          <li>How might you intentionally leverage these strengths in a current challenge or goal?</li>
         </ul>
       </section>
     `;
@@ -268,6 +282,171 @@
       renderSurvey();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
+
+    // Draw radar after the canvas exists in the DOM
+    drawRadar(avgs);
+
+    // Redraw on resize for responsiveness
+    window.addEventListener("resize", debounce(() => drawRadar(avgs), 150), { passive: true });
+  }
+
+  function drawRadar(avgs) {
+    const canvas = document.getElementById("radarCanvas");
+    if (!canvas) return;
+
+    const parent = canvas.parentElement;
+    const size = Math.min(560, Math.max(320, parent ? parent.clientWidth : 420));
+
+    // Handle high-DPI screens
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(size * dpr);
+    canvas.height = Math.floor(size * dpr);
+    canvas.style.width = `${size}px`;
+    canvas.style.height = `${size}px`;
+
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, size, size);
+
+    const types = (window.CCW_TYPES || []).slice();
+    if (!types.length) return;
+
+    // Soft visual design (non-evaluative)
+    const centerX = size / 2;
+    const centerY = size / 2;
+    const outerR = (size * 0.36);
+    const labelR = (size * 0.44);
+
+    const rings = 3; // gentle guide rings (no numbers)
+    const startAngle = -Math.PI / 2; // top
+
+    // Colors
+    const gridStroke = "#e6e6e6";
+    const axisStroke = "#eaeaea";
+    const labelColor = "#333";
+    const polyFill = "rgba(17, 17, 17, 0.08)";
+    const polyStroke = "rgba(17, 17, 17, 0.55)";
+
+    // Ring grid
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = gridStroke;
+    for (let r = 1; r <= rings; r++) {
+      const rr = (outerR * r) / rings;
+      drawPolygon(ctx, centerX, centerY, rr, types.length, startAngle, false);
+      ctx.stroke();
+    }
+
+    // Axis lines and labels
+    for (let i = 0; i < types.length; i++) {
+      const angle = startAngle + (2 * Math.PI * i) / types.length;
+      const x = centerX + Math.cos(angle) * outerR;
+      const y = centerY + Math.sin(angle) * outerR;
+
+      // axis line
+      ctx.beginPath();
+      ctx.strokeStyle = axisStroke;
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+
+      // labels (small, soft)
+      const label = prettyType(types[i]);
+      const lx = centerX + Math.cos(angle) * labelR;
+      const ly = centerY + Math.sin(angle) * labelR;
+
+      ctx.fillStyle = labelColor;
+      ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif";
+      ctx.textBaseline = "middle";
+
+      const align = Math.cos(angle);
+      if (align > 0.35) ctx.textAlign = "left";
+      else if (align < -0.35) ctx.textAlign = "right";
+      else ctx.textAlign = "center";
+
+      // Split long labels into two lines if needed
+      const lines = wrapLabel(label, 16);
+      if (lines.length === 1) {
+        ctx.fillText(lines[0], lx, ly);
+      } else {
+        ctx.fillText(lines[0], lx, ly - 7);
+        ctx.fillText(lines[1], lx, ly + 7);
+      }
+    }
+
+    // Data polygon
+    const points = [];
+    for (let i = 0; i < types.length; i++) {
+      const t = types[i];
+      const v = Number.isFinite(avgs[t]) ? avgs[t] : 1;
+      // Map 1-6 to 0-1
+      const norm = clamp((v - 1) / 5, 0, 1);
+      const angle = startAngle + (2 * Math.PI * i) / types.length;
+
+      points.push({
+        x: centerX + Math.cos(angle) * (outerR * norm),
+        y: centerY + Math.sin(angle) * (outerR * norm)
+      });
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+    ctx.closePath();
+
+    ctx.fillStyle = polyFill;
+    ctx.fill();
+
+    ctx.strokeStyle = polyStroke;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Gentle vertex dots
+    ctx.fillStyle = "rgba(17, 17, 17, 0.55)";
+    for (const p of points) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawPolygon(ctx, cx, cy, r, n, startAngle, beginPath = true) {
+    if (beginPath) ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const a = startAngle + (2 * Math.PI * i) / n;
+      const x = cx + Math.cos(a) * r;
+      const y = cy + Math.sin(a) * r;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+  }
+
+  function wrapLabel(text, maxLen) {
+    const t = String(text);
+    if (t.length <= maxLen) return [t];
+    const parts = t.split(" ");
+    if (parts.length === 1) return [t.slice(0, maxLen), t.slice(maxLen)];
+
+    const line1 = [];
+    const line2 = [];
+    for (const w of parts) {
+      const target = (line1.join(" ").length + (line1.length ? 1 : 0) + w.length <= maxLen) ? line1 : line2;
+      target.push(w);
+    }
+    if (!line2.length) return [line1.join(" ")];
+    return [line1.join(" "), line2.join(" ")];
+  }
+
+  function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  }
+
+  function debounce(fn, ms) {
+    let t = null;
+    return function () {
+      if (t) clearTimeout(t);
+      t = setTimeout(() => fn.apply(this, arguments), ms);
+    };
   }
 
   function showError(msg) {
