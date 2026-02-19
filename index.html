@@ -16,6 +16,10 @@
       .hero h1 { margin: 0 0 8px 0; font-size: 1.8rem; }
       .hero p { margin: 0; color: #333; }
 
+      /* Logo (your HTML references these classes) */
+      .logoWrap { margin-bottom: 16px; display: flex; justify-content: center; }
+      .siteLogo { height: auto; display: block; }
+
       .card {
         background: #fff;
         border: 1px solid #e5e5e5;
@@ -123,6 +127,33 @@
         background: #fafafa;
       }
 
+      /* Radar chart container + legend (needed for the new visualization) */
+      .radarWrap {
+        margin-top: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 6px;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        background: #fafafa;
+      }
+      #radarCanvas { display: block; }
+
+      .radarLegend {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .legendDot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(17, 17, 17, 0.55);
+        display: inline-block;
+      }
+
       .bullets { margin: 8px 0 0 18px; color: #333; }
       footer { padding: 10px 0 20px 0; color: #666; font-size: 0.95rem; }
 
@@ -149,7 +180,7 @@
         </div>
         <h1>Community Cultural Wealth Profile</h1>
         <p>
-        Developed by the Networks and Cultural Assets Project | Shared under a CC BY-NC-SA 4.0
+          Developed by the Networks and Cultural Assets Project | Shared under a CC BY-NC-SA 4.0
         </p>
       </header>
 
@@ -157,7 +188,7 @@
 
       <footer>
         This Community Cultural Wealth Profile tool was developed by the Networks and Cultural Assets Project (NCA Project). The assessment is designed as a strengths-based reflection activity to help participants recognize and build upon their forms of community cultural wealth.
-        <br><br>To learn more about the Networks and Cultural Assets Project and our research, visit <a href = "https://ncaproject.dcs.wisc.edu/" target="_blank">our website.</a>
+        <br><br>To learn more about the Networks and Cultural Assets Project and our research, visit <a href="https://ncaproject.dcs.wisc.edu/" target="_blank">our website.</a>
         <br><br>This tool is shared under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0).
       </footer>
     </main>
