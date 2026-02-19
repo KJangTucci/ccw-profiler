@@ -399,8 +399,8 @@
   );
 
     // center a bit stronger, edges fade out
-    fillGrad.addColorStop(0, "rgba(248, 155, 41, 0.5)");  // #b72f34
-    fillGrad.addColorStop(1, "rgba(248, 155, 41, 0.9)");
+    fillGrad.addColorStop(0, "rgba(201, 240, 222, 0.7)");  // #c9f0de
+    fillGrad.addColorStop(1, "rgba(201, 240, 222, 0.7)");
 
     ctx.fillStyle = fillGrad;
     ctx.fill();
