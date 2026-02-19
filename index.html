@@ -113,6 +113,34 @@
       .strengthsText { font-weight: 750; }
       .desc { margin-top: 12px; color: #222; }
 
+
+      .scoreChart { margin-top: 12px; display: grid; gap: 10px; }
+      .scoreRow {
+        display: grid;
+        grid-template-columns: minmax(150px, 2fr) minmax(180px, 5fr) auto;
+        gap: 10px;
+        align-items: center;
+      }
+      .scoreLabel { font-weight: 600; color: #222; }
+      .scoreTrack {
+        width: 100%;
+        height: 14px;
+        border-radius: 999px;
+        background: #f0e8dd;
+        border: 1px solid #e5d6bf;
+        overflow: hidden;
+      }
+      .scoreFill {
+        height: 100%;
+        background: linear-gradient(90deg, #d3a86a, #b72f34);
+      }
+      .scoreValue {
+        font-weight: 700;
+        color: #3e2325;
+        min-width: 42px;
+        text-align: right;
+      }
+
       .profileImageWrap { margin-top: 14px; }
       .profileImage {
         width: 100%;
@@ -132,6 +160,8 @@
         .option { min-height: 62px; }
         .badge { width: 30px; height: 30px; }
         .optText { font-size: 0.9rem; }
+        .scoreRow { grid-template-columns: 1fr; gap: 6px; }
+        .scoreValue { text-align: left; }
       }
     </style>
   </head>
@@ -157,13 +187,3 @@
 
       <footer>
         This Community Cultural Wealth Profile tool was developed by the Networks and Cultural Assets Project (NCA Project). The assessment is designed as a strengths-based reflection activity to help participants recognize and build upon their forms of community cultural wealth.
-        <br><br>To learn more about the Networks and Cultural Assets Project and our research, visit <a href = "https://ncaproject.dcs.wisc.edu/" target="_blank">our website.</a>
-        <br><br>This tool is shared under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0).
-      </footer>
-    </main>
-
-    <script src="items.js"></script>
-    <script src="profiles.js"></script>
-    <script src="app.js"></script>
-  </body>
-</html>
