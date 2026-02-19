@@ -249,16 +249,11 @@
       <section class="card">
         <h3 class="h3">Strengths snapshot map</h3>
         <p class="muted">
-          This map is a reflection snapshot of where your responses are showing up across areas right now. It is not a grade.
+          This map is a snapshot of where your responses are showing up across different types of community cultural wealth scale.
         </p>
 
         <div class="radarWrap">
           <canvas id="radarCanvas" aria-label="Community Cultural Wealth strengths snapshot map" role="img"></canvas>
-        </div>
-
-        <div class="radarLegend muted">
-          <span class="legendDot"></span>
-          <span>Your current pattern</span>
         </div>
       </section>
 
