@@ -34,7 +34,7 @@
   function prettyType(typeKey) {
     return (window.CCW_TYPE_LABELS && window.CCW_TYPE_LABELS[typeKey])
       ? window.CCW_TYPE_LABELS[typeKey]
-      : typeKey;
+      : typeKey.replaceAll("_", " ").replace(/\b\w/g, c => c.toUpperCase());
   }
 
   function shuffle(array) {
@@ -112,7 +112,7 @@
       console.log("CCW debug - has profile map:", Boolean(window.CCW_PROFILE_NAMES));
       console.log("CCW debug - profileName:", profileName);
 
-      renderResults(profileKey, profileName, top3);
+      renderResults(profileKey, profileName, top3, avgs);
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
@@ -212,7 +212,38 @@
     return parts.join(" ").replace(/\s+/g, " ").trim();
   }
 
-  function renderResults(profileKey, profileName, top3) {
+  function renderScoreBars(avgs) {
+    const MAX_SCALE_SCORE = 6;
+
+    const rows = Object.entries(avgs)
+      .filter(([, avg]) => Number.isFinite(avg))
+      .sort((a, b) => b[1] - a[1])
+      .map(([type, avg]) => {
+        const pct = Math.max(0, Math.min(100, (avg / MAX_SCALE_SCORE) * 100));
+        return `
+          <div class="scoreRow">
+            <div class="scoreLabel">${escapeHtml(prettyType(type))}</div>
+            <div class="scoreTrack" aria-hidden="true">
+              <div class="scoreFill" style="width:${pct.toFixed(2)}%"></div>
+            </div>
+            <div class="scoreValue">${avg.toFixed(2)}</div>
+          </div>
+        `;
+      })
+      .join("");
+
+    return `
+      <section class="card">
+        <h3 class="h3">Your average score by CCW scale</h3>
+        <p class="muted">Scale range: 1 (lowest) to 6 (highest).</p>
+        <div class="scoreChart" role="img" aria-label="Bar chart of your average score by Community Cultural Wealth scales">
+          ${rows}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderResults(profileKey, profileName, top3, avgs) {
     const imagePath =
       (window.CCW_PROFILE_IMAGES && window.CCW_PROFILE_IMAGES[profileKey])
         ? window.CCW_PROFILE_IMAGES[profileKey]
@@ -247,6 +278,8 @@
           <button class="btn" id="btnStartOver" type="button">Start over</button>
         </div>
       </section>
+
+      ${renderScoreBars(avgs)}
 
       <section class="card">
         <h3 class="h3">Reflection prompt</h3>
