@@ -311,7 +311,7 @@
     const centerY = size / 2;
 
     // Give labels room so they don't get clipped by the canvas edge
-    const labelPadding = 64; // increase if you still see clipping (try 72)
+    const labelPadding = 72; // increase if there is still clipping
     const outerR = (size / 2) - labelPadding;
 
     // Place labels a bit outside the grid, but still within canvas bounds
@@ -399,8 +399,8 @@
   );
 
     // center a bit stronger, edges fade out
-    fillGrad.addColorStop(0, "rgba(183, 47, 52, 0.22)");  // #b72f34
-    fillGrad.addColorStop(1, "rgba(183, 47, 52, 0.04)");
+    fillGrad.addColorStop(0, "rgba(183, 47, 52, 1)");  // #b72f34
+    fillGrad.addColorStop(1, "rgba(248, 155, 41, 1)");
 
     ctx.fillStyle = fillGrad;
     ctx.fill();
