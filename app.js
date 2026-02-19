@@ -60,33 +60,7 @@
           This is a reflection tool assessing your cultural strengths. The following questions ask about yourself and your life experiences in general. On a scale from 1 (Not at all like me) to 6 (Exactly like me), please indicate how well each of the following statements describes you. Click "View my profile" once you complete the survey. Your responses are processed locally in your browser and are not saved or sent anywhere.
         </p>
 
-        <div class="scale">
-          ${SCALE.map(s => `
-            <div class="pill">
-              <strong>${s.value}</strong>
-              <span>${escapeHtml(s.label)}</span>
-            </div>
-          `).join("")}
-        </div>
-      </section>
-    `;
-
-    const questions = shuffledItems.map(renderItem).join("");
-
-    const actions = `
-      <section class="card">
-        <div class="actions">
-          <button class="btn primary" id="btnSubmit" type="button">View my profile</button>
-          <button class="btn" id="btnReset" type="button">Reset</button>
-        </div>
-        <div id="errorBox" class="error" role="alert" aria-live="polite" style="display:none"></div>
-      </section>
-    `;
-
-    appEl.innerHTML = intro + questions + actions;
-
-    document.getElementById("btnSubmit").addEventListener("click", () => {
-      const check = getResponses();
+@@ -90,51 +90,51 @@
       if (!check.ok) {
         showError(`Please answer all items. Missing: ${check.missingId}`);
         scrollToId(check.missingId);
@@ -138,55 +112,7 @@
     }).join("");
 
     return `
-      <section class="card" id="${item.id}">
-        <div class="qhead">
-          <div class="qnum">${num}</div>
-          <div class="qtext">
-            <div class="statement">${escapeHtml(item.text)}</div>
-          </div>
-        </div>
-
-        <div class="options options6" role="radiogroup" aria-label="${escapeHtml(item.text)}">
-          ${options}
-        </div>
-      </section>
-    `;
-  }
-
-  function getResponses() {
-    const responses = {};
-    for (const item of shuffledItems) {
-      const chosen = document.querySelector(`input[name="${item.id}"]:checked`);
-      if (!chosen) return { ok: false, missingId: item.id };
-      let v = Number(chosen.value);
-      if (item.reverse) v = reverseScore(v);
-      responses[item.id] = v;
-    }
-    return { ok: true, responses };
-  }
-
-  function computeAverages(responses) {
-    const sums = {};
-    const counts = {};
-    for (const t of window.CCW_TYPES) {
-      sums[t] = 0;
-      counts[t] = 0;
-    }
-
-    for (const item of window.CCW_ITEMS) {
-      const v = responses[item.id];
-      sums[item.type] += v;
-      counts[item.type] += 1;
-    }
-
-    const avgs = {};
-    for (const t of window.CCW_TYPES) {
-      avgs[t] = counts[t] ? (sums[t] / counts[t]) : NaN;
-    }
-    return avgs;
-  }
-
-  function getTopKTypes(avgs, k) {
+@@ -190,86 +190,119 @@
     const entries = Object.entries(avgs)
       .filter(([, v]) => Number.isFinite(v))
       .sort((a, b) => {
@@ -306,21 +232,108 @@
   function showError(msg) {
     const box = document.getElementById("errorBox");
     box.style.display = "block";
-    box.textContent = msg;
-  }
+index.html
+index.html
++30
+-0
 
-  function hideError() {
-    const box = document.getElementById("errorBox");
-    box.style.display = "none";
-    box.textContent = "";
-  }
+@@ -91,69 +91,99 @@
+        color: #b72f34;
+        padding: 10px 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 650;
+      }
+      .btn.primary { background: #b72f34; color: #fff; }
 
-  function scrollToId(id) {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-  }
+      .error {
+        margin-top: 12px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: #fff2f2;
+        border: 1px solid #ffd0d0;
+        color: #8a0000;
+      }
 
-  // Boot
-  initShuffle();
-  renderSurvey();
-})();
+      .profileLead { font-size: 1.15rem; font-weight: 650; margin-top: 6px; }
+      .profileName { font-weight: 900; }
+
+      .strengthsLine { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+      .tag { font-size: 0.9rem; border: 1px solid #e6e6e6; padding: 6px 10px; border-radius: 999px; color: #444; }
+      .strengthsText { font-weight: 750; }
+      .desc { margin-top: 12px; color: #222; }
+
+
+      .scoreChart { margin-top: 12px; display: grid; gap: 10px; }
+      .scoreRow {
+        display: grid;
+        grid-template-columns: minmax(150px, 2fr) minmax(180px, 5fr) auto;
+        gap: 10px;
+        align-items: center;
+      }
+      .scoreLabel { font-weight: 600; color: #222; }
+      .scoreTrack {
+        width: 100%;
+        height: 14px;
+        border-radius: 999px;
+        background: #f0e8dd;
+        border: 1px solid #e5d6bf;
+        overflow: hidden;
+      }
+      .scoreFill {
+        height: 100%;
+        background: linear-gradient(90deg, #d3a86a, #b72f34);
+      }
+      .scoreValue {
+        font-weight: 700;
+        color: #3e2325;
+        min-width: 42px;
+        text-align: right;
+      }
+
+      .profileImageWrap { margin-top: 14px; }
+      .profileImage {
+        width: 100%;
+        max-height: 320px;
+        object-fit: contain;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        background: #fafafa;
+      }
+
+      .bullets { margin: 8px 0 0 18px; color: #333; }
+      footer { padding: 10px 0 20px 0; color: #666; font-size: 0.95rem; }
+
+      @media (max-width: 860px) {
+        .scale { grid-template-columns: 1fr; }
+        .options6 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .option { min-height: 62px; }
+        .badge { width: 30px; height: 30px; }
+        .optText { font-size: 0.9rem; }
+        .scoreRow { grid-template-columns: 1fr; gap: 6px; }
+        .scoreValue { text-align: left; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <main class="container">
+      <header class="hero">
+        <div class="logoWrap">
+          <img 
+            src="https://ncaproject.dcs.wisc.edu/wp-content/uploads/sites/156/2025/12/NCA-logo-1536x495.png" 
+            alt="Networks and Cultural Assets Project Logo"
+            class="siteLogo"
+            width="350"
+          />
+        </div>
+        <h1>Community Cultural Wealth Profile</h1>
+        <p>
+        Developed by the Networks and Cultural Assets Project | Shared under a CC BY-NC-SA 4.0
+        </p>
+      </header>
+
+      <section id="app"></section>
+
+      <footer>
+        This Community Cultural Wealth Profile tool was developed by the Networks and Cultural Assets Project (NCA Project). The assessment is designed as a strengths-based reflection activity to help participants recognize and build upon their forms of community cultural wealth.
