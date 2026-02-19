@@ -309,8 +309,13 @@
     // Soft visual design (non-evaluative)
     const centerX = size / 2;
     const centerY = size / 2;
-    const outerR = (size * 0.36);
-    const labelR = (size * 0.44);
+
+    // Give labels room so they don't get clipped by the canvas edge
+    const labelPadding = 64; // increase if you still see clipping (try 72)
+    const outerR = (size / 2) - labelPadding;
+
+    // Place labels a bit outside the grid, but still within canvas bounds
+    const labelR = outerR + 28;
 
     const rings = 3; // gentle guide rings (no numbers)
     const startAngle = -Math.PI / 2; // top
