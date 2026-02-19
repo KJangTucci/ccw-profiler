@@ -34,7 +34,6 @@
   function prettyType(typeKey) {
     return (window.CCW_TYPE_LABELS && window.CCW_TYPE_LABELS[typeKey])
       ? window.CCW_TYPE_LABELS[typeKey]
-      : typeKey;
       : typeKey.replaceAll("_", " ").replace(/\b\w/g, c => c.toUpperCase());
   }
 
@@ -87,7 +86,6 @@
       console.log("CCW debug - has profile map:", Boolean(window.CCW_PROFILE_NAMES));
       console.log("CCW debug - profileName:", profileName);
 
-      renderResults(profileKey, profileName, top3);
       renderResults(profileKey, profileName, top3, avgs);
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -140,7 +138,6 @@
     return parts.join(" ").replace(/\s+/g, " ").trim();
   }
 
-  function renderResults(profileKey, profileName, top3) {
   function renderScoreBars(avgs) {
     const MAX_SCALE_SCORE = 6;
 
